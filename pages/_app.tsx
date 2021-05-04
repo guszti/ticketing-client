@@ -1,11 +1,12 @@
 import "bootstrap/dist/css/bootstrap.css";
+import { NextPageContext } from "next";
 import Navbar from "../components/global/NavBar";
 import { apiGet, apiPrefixMap, apiUrlMap } from "../utils/apiUtil";
 
-function AppComponent({ Component, pageProps }) {
+function AppComponent({ Component, pageProps, currentUser }) {
     return (
         <div>
-            <Navbar />
+            <Navbar currentUser={currentUser} />
             <div className="container">
                 <Component {...pageProps} />
             </div>
@@ -13,19 +14,23 @@ function AppComponent({ Component, pageProps }) {
     );
 }
 
-AppComponent.getInitialProps = async (condext) => {
+AppComponent.getInitialProps = async (context: NextPageContext) => {
     const prefix = process.browser
         ? apiPrefixMap.client
         : apiPrefixMap.authService;
 
+    const headers = process.browser ? null : context.ctx.req.headers;
+
     try {
-        const user = await apiGet(apiPrefixMap.client, apiUrlMap.currentUser);
+        const { data } = await apiGet(prefix, apiUrlMap.currentUser, headers);
 
-        return { props: { currentUser: user } };
+        return {
+            currentUser: data,
+        };
     } catch (e) {
-        console.log(e.message);
+        console.log(e.response?.data?.customError || e.message);
 
-        return {};
+        return { currentUser: null };
     }
 };
 

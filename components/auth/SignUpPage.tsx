@@ -1,9 +1,12 @@
 import { useState } from "react";
 import { apiPost, apiPrefixMap, apiUrlMap } from "../../utils/apiUtil";
+import { useRouter } from "next/router";
 
 const SignUpPage = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+
+    const router = useRouter();
 
     const submit = async () => {
         try {
@@ -11,6 +14,8 @@ const SignUpPage = () => {
                 email,
                 password,
             });
+
+            router.push("/auth/log-in");
         } catch (e) {
             console.log(e.response.data.customError);
         }

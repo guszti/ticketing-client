@@ -4,7 +4,7 @@ type ApiPrefix = "client" | "authService";
 
 export const apiPrefixMap: { [value in ApiPrefix]: string } = {
     client: "ticketing.local",
-    authService: "auth-clusterip-srv",
+    authService: "auth-clusterip-srv:4000",
 };
 
 type ApiUrl = "signUp" | "logIn" | "logOut" | "currentUser";
@@ -16,19 +16,21 @@ export const apiUrlMap: { [value in ApiUrl]: string } = {
     currentUser: "/api/auth/current-user",
 };
 
-export const apiGet = async (prefix: string, url: string) => {
-    console.log("lel")
-    const response = await axios.get(`http://${prefix}${url}`);
-    console.log("response", response)
+export const apiGet = async (prefix: string, url: string, headers?: any) => {
+    const config = !!headers ? { headers } : {};
+    const response = await axios.get(`http://${prefix}${url}`, config);
+
     return response;
 };
 
 export const apiPost = async (
     prefix: string,
     url: string,
-    body: { [key: string]: any }
+    body?: { [key: string]: any },
+    headers?: any
 ) => {
-    const { data } = await axios.post(`http://${prefix}${url}`, body);
+    const config = headers ? { headers } : {};
+    const { data } = await axios.post(`http://${prefix}${url}`, body, config);
 
     return data;
 };
